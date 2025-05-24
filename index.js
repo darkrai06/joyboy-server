@@ -14,6 +14,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
+const corsOptions = {
+    origin: ['http://localhost:5173', 'https://b10-a12.web.app', 'https://b10-a12.firebaseapp.com'], 
+    credentials: true,
+    optionalSuccessStatus: 200,
+}
 app.use(cors());
 app.use(express.json());
 // app.use(cookieParser());
@@ -94,7 +99,17 @@ async function run() {
             res.send({ token });
           })
 
-
+        // Logout
+        // app.post('/logout', async (req, res) => {
+        //     const user = req.body;
+        //     console.log("logging out", user);
+        //     res.clearCookie("token", {
+        //         maxAge: 0,
+        //         secure: process.env.NODE_ENV === "production",
+        //         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        //     })
+        //         .send({ success: true });
+        // });
 
         // use verify worker after verifyToken
         const verifyWorker = async (req, res, next) => {
@@ -173,6 +188,17 @@ async function run() {
             res.status(500).json({ message: 'Internal Server Error' });
         }
     };
+    
+
+
+
+
+
+        // ----------------------------------
+        // ---------- API Routes ------------
+        // ----------------------------------
+    
+
         app.get('/best/users', async (req, res) => {
             try {
                 let query = {};
@@ -697,7 +723,7 @@ app.post('/api/payments', verifyToken,verifyBuyer, async (req, res) => {
     try {
         // Update user's coins with case-insensitive email search
         await usersCollection.updateOne(
-            { email: new RegExp(`^${email.trim()}$`, 'i') }, 
+            { email: new RegExp(`^${email.trim()}$`, 'i') }, // Case-insensitive regex
             { $inc: { coins } }
         );
 
@@ -819,6 +845,9 @@ app.post('/api/submissions',verifyToken,verifyWorker, async (req, res) => {
             return res.status(400).json({ error: 'Worker email or name is missing' });
         }
 
+        // console.log("Worker email:", workerEmail);
+
+        // Validate taskId and submissionDetails
         if (!submissionData.taskId || !submissionData.submissionDetails) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
@@ -939,6 +968,10 @@ app.post('/api/withdrawals', verifyToken,verifyWorker, async (req, res) => {
 
 // Get all users (admin only)
 app.get('/admin/users',verifyToken,verifyAdmin,  async (req, res) => {
+    // // Check if the user is an admin
+    // if (req.query.role !== 'admin') {
+    //     return res.status(403).json({ error: 'Forbidden' });
+    // }
 
     try {
         const users = await usersCollection.find().toArray();
@@ -952,6 +985,12 @@ app.get('/admin/users',verifyToken,verifyAdmin,  async (req, res) => {
 
  // Update user role (admin only)
  app.patch('/api/users/:id/role',verifyToken,verifyAdmin, async (req, res) => {
+    // const { role } = req.query; // Extract the role from query parameters
+
+    // // Check if the user is an admin
+    // if (role !== 'admin') {
+    //     return res.status(403).json({ error: 'Forbidden' });
+    // }
 
     try {
         const userId = req.params.id;
@@ -986,6 +1025,12 @@ app.get('/admin/users',verifyToken,verifyAdmin,  async (req, res) => {
 
 // Delete user (admin only)
 app.delete('/api/users/:id',verifyToken,verifyAdmin, async (req, res) => {
+    // const { role } = req.query; 
+
+    // // Check if the user is an admin
+    // if (role !== 'admin') {
+    //     return res.status(403).json({ error: 'Forbidden' });
+    // }
 
     try {
         const userId = req.params.id;
@@ -1012,6 +1057,12 @@ app.delete('/api/users/:id',verifyToken,verifyAdmin, async (req, res) => {
 //admin stats
 app.get('/api/admin/stats',verifyToken,verifyAdmin, async (req, res) => {
     try {
+        // const userRole = req.query.role;
+
+        // // Check if the user is an admin
+        // if (userRole !== 'admin') {
+        //     return res.status(403).json({ error: 'Forbidden: Only admins can access this route' });
+        // }
 
         const stats = {
             totalWorkers: await usersCollection.countDocuments({ role: 'worker' }),
@@ -1055,6 +1106,13 @@ app.get('/admin/withdrawals',verifyToken,verifyAdmin, async (req, res) => {
 // Admin approve withdrawal request
 app.patch('/admin/withdrawals/:id/approve', verifyToken,verifyAdmin, async (req, res) => {
     try {
+        // const userRole = req.query.role?.trim(); // Ensure no leading/trailing spaces
+
+        // // Check if the user is an admin
+        // if (userRole !== 'admin') {
+        //     return res.status(403).json({ error: 'Forbidden: Only admins can approve withdrawals' });
+        // }
+
         const withdrawalId = req.params.id;
         const withdrawal = await withdrawalsCollection.findOne({ _id: new ObjectId(withdrawalId) });
 
@@ -1101,6 +1159,12 @@ app.patch('/admin/withdrawals/:id/approve', verifyToken,verifyAdmin, async (req,
 
 // Get all tasks for admin
 app.get('/api/admin/tasks',verifyToken,verifyAdmin, async (req, res) => {
+    // const { role } = req.query; 
+
+    // // Check if the user is an admin
+    // if (role !== 'admin') {
+    //     return res.status(403).json({ error: 'Forbidden' });
+    // }
 
     try {
         const tasks = await tasksCollection.find().toArray(); // Fetch all tasks
@@ -1204,8 +1268,8 @@ app.get('/users/profile', verifyToken, async (req, res) => {
         console.error('Error getting user profile:', error);
         res.status(500).json({ error: 'Failed to get user profile' });
     }
-});  
-   
+});
+
   } finally {
    
     // await client.close();
@@ -1218,4 +1282,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-

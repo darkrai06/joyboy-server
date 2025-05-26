@@ -13,12 +13,6 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
-const corsOptions = {
-    origin: ['http://localhost:5173', 'https://b10-a12.web.app', 'https://b10-a12.firebaseapp.com'], 
-    credentials: true,
-    optionalSuccessStatus: 200,
-}
 app.use(cors());
 app.use(express.json());
 // app.use(cookieParser());

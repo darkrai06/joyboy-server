@@ -13,7 +13,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: '*', 
+  credentials: true,
+}));
 app.use(express.json());
 // app.use(cookieParser());
 app.use(morgan('dev'))

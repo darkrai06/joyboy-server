@@ -37,7 +37,7 @@ app.use(morgan('dev'))
       next();
     })
   }
-
+/*
   const sendEmailNotification = async ({ to, subject, text, html }) => {
     try {
         // Create a transporter object
@@ -64,7 +64,7 @@ app.use(morgan('dev'))
     } catch (error) {
         console.error(`Error sending email to ${to}:`, error);
     }
-};
+}; */
 
 module.exports = sendEmailNotification;
 

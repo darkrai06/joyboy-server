@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express()
 const jwt = require('jsonwebtoken')
-const stripe = require('stripe')(process.env.PAYMENT_SECRETE_KEY);
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 3000
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 

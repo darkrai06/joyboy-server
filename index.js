@@ -1,24 +1,24 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const app = express()
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
-const port = process.env.PORT || 3000
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-app.use(express.json())
-app.use(cors())
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(cors());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ry27zgj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
 });
 
 async function run() {
@@ -31,16 +31,11 @@ async function run() {
 
 
 
-        // jwt api 
-
         app.post('/jwt', async (req, res) => {
-            const user = req.body;
-
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRTE_KEY, {
-                expiresIn: '1h'
-            });
-            res.send({ token })
-        })
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_KEY, { expiresIn: '1h' });
+      res.send({ token });
+    });
         const verifyToken = (req, res, next) => {
 
             if (!req.headers.authorization) {

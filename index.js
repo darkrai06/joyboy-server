@@ -245,12 +245,12 @@ async function run() {
 
                 await BuyerTask.insertOne(data, { session });
                 const updatedCoins = userData.coin - totalPayableAmount;
-                const tushar = await users.updateOne(userQuery, { $set: { coin: updatedCoins } }, { session });
+                const mahin = await users.updateOne(userQuery, { $set: { coin: updatedCoins } }, { session });
 
                 await session.commitTransaction();
                 session.endSession();
 
-                res.status(201).json({ message: 'Task added and coins updated!', tushar });
+                res.status(201).json({ message: 'Task added and coins updated!', mahin });
 
             } catch (error) {
                 await session.abortTransaction();
@@ -275,14 +275,13 @@ async function run() {
                             buyer_email: email,
                             status: 'approved',
                         }
-                    }, // Match payments for the user
+                    },
                     { $group: { _id: null, total: { $sum: "$payable_amount" } } } // Sum the 'cost' field
                 ]).toArray();
                 // Extract total payment or fallback to 0 if no payments exist
                 const totalPaymentPaid = totalPayment[0]?.total || 0;
                
 
-                // Send the response
                 res.send({
                     totalTaskCount,
                     pendingTask,
@@ -488,7 +487,6 @@ async function run() {
                 return res.status(302).send({ message: 'it is already submited' })
             }
 
-            // const query={}
             const result = await Submissions.insertOne(data)
             const reduce = {
                 _id: new ObjectId(id),

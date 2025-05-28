@@ -126,8 +126,8 @@ async function run() {
             const totalCoinsResult = await users.aggregate([
                 {
                   $group: {
-                    _id: null, // No grouping by specific field
-                    totalCoins: { $sum: '$coin' }, // Sum up the `coin` field
+                    _id: null,
+                    totalCoins: { $sum: '$coin' }, 
                   },
                 },
               ]).toArray();
@@ -228,8 +228,6 @@ async function run() {
         })
 
 
-        // Buyer collection 
-        // Buyer collection - Add Task and Update User Coins
         app.post('/Addtask', verifyToken, verifyBuyer, async (req, res) => {
             const session = client.startSession();
 
@@ -303,7 +301,7 @@ async function run() {
             const query = { user: data };
 
             const result = await BuyerTask.find(query)
-                .sort({ completionDate: -1 })  // Sort by compilationDate in descending order
+                .sort({ completionDate: -1 })  
                 .toArray();
 
             res.send(result);
@@ -527,7 +525,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('Welcome!!!')
 })
 
 app.listen(port, () => {
